@@ -1,0 +1,39 @@
+/* .body {
+  position: relative;
+  background-color: #2b3467;
+  width: 100%;
+  height: 100%;
+  min-height: 750px;
+  background-image: url("https://i.ibb.co/tCS5JkV/pexels-davide-de-giovanni-3171795.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.tab {
+  position: absolute;
+  top: 8px;
+}
+
+.tabpart {
+  position: absolute;
+  top: 115px;
+}
+.bg {
+  width: 100%;
+  height: 100%;
+  min-height: 750px;
+  background-color: black;
+  opacity: 95%;
+} */
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
