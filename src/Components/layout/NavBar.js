@@ -8,7 +8,14 @@ import { gql, useQuery, useMutation } from "@apollo/client";
 import { TABLE_DATA_DETAIL } from "../../GraphQL/Queries";
 
 import { CREATE_CRUD_INFO_MUTATION } from "../../GraphQL/Mutations";
-import { menu } from "@material-tailwind/react";
+
+import useSignIn from "../../GraphQLApiCall/useSignIn";
+import useOtpCheck from "../../GraphQLApiCall/useOtpCheck";
+import useSignUp from "../../GraphQLApiCall/useSignUp";
+
+import SingIn from "../user/SingIn";
+import OtpCheck from "../user/OtpCheck";
+import SignUp from "../user/SignUp";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -20,14 +27,14 @@ export default function NavBar({
   cardDataDic,
   menuList,
 }) {
-  const { menuName, setMenuName, navClick, setNavClick } =
+  const { menuName, setMenuName, navClick, setNavClick, singIn, setSignIn } =
     useContext(UserContext);
   const [uniqueId, setUniqueId] = useState(Math.floor(Date.now() / 1000));
-  const [singIn, setSignIn] = useState(false);
-  const [signInPage, setSignInPage] = useState(false);
-  const [signUpPage, setSignUpPage] = useState(false);
+  // const [singIn, setSignIn] = useState(false);
+  // const [signInPage, setSignInPage] = useState(false);
+  // const [signUpPage, setSignUpPage] = useState(false);
   const [open, setOpen] = useState(false);
-  const cancelButtonRef = useRef(null);
+  // const cancelButtonRef = useRef(null);
 
   const [createCrudInfo] = useMutation(CREATE_CRUD_INFO_MUTATION, {
     refetchQueries: [
@@ -62,6 +69,124 @@ export default function NavBar({
     //   }
     // });
   };
+
+  const { signin_loading, signin_error, signin_success, setSignInValues } =
+    useSignIn();
+
+  const {
+    otp_loading,
+    otp_error,
+    otp_success,
+    setOtpCheckEmail,
+    setOtpCheckValues,
+  } = useOtpCheck();
+
+  const { signup_loading, signup_error, signup_success, setSignUpValues } =
+    useSignUp();
+
+  const [adminUser, setAdminUser] = useState("");
+  const [signInPage, setSignInPage] = useState(true);
+  const [signUpPage, setSignUpPage] = useState(false);
+  const [otpCheckPage, setOtpCheckPage] = useState(false);
+  const [signInValue, setSignInValue] = useState({ email: "", password: "" });
+  const [signUpValue, setSignUpValue] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+  const [otpCheckValue, setOtpCheckValue] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const cancelButtonRef = useRef(null);
+
+  const readUserDataFromLocal = () => {
+    const adminUserData = localStorage.getItem("admin_user");
+
+    if (adminUserData) {
+      setAdminUser(JSON.parse(adminUserData));
+    }
+  };
+
+  useEffect(() => {
+    readUserDataFromLocal();
+  }, [singIn, signInPage, signUpPage]);
+
+  const onSignInFormValue = (e) => {
+    const { name, value } = e.target;
+    setSignInValue((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    setSignInValues(signInValue);
+    setUserEmail(signInValue.email);
+    e.preventDefault();
+    setSignInValue({ email: "", password: "" });
+  };
+
+  useEffect(() => {
+    if (signin_success?.userSignIn?.result === true) {
+      setOtpCheckPage(true);
+      setSignInPage(false);
+      setSignUpPage(false);
+    }
+  }, [signin_success?.userSignIn?.result]);
+
+  const confirmOtp = () => {
+    setOtpCheckEmail(userEmail);
+    setOtpCheckValues(otpCheckValue);
+  };
+
+  useEffect(() => {
+    if (otp_success?.userOtpCheck?.result === true) {
+      let user_data = { user_email: userEmail, user_flag: true };
+      localStorage.setItem("admin_user", JSON.stringify(user_data));
+      setSignIn(false);
+      setOtpCheckPage(false);
+      setSignInPage(false);
+      setSignUpPage(false);
+      setTimeout(() => {
+        readUserDataFromLocal();
+      }, 2000);
+    }
+  }, [otp_success?.userOtpCheck?.result]);
+
+  const adminUserLogout = () => {
+    let user_data = { user_email: null, user_flag: false };
+    localStorage.setItem("admin_user", JSON.stringify(user_data));
+    setTimeout(() => {
+      readUserDataFromLocal();
+      setSignInPage(true);
+    }, 1000);
+  };
+
+  const userAdminSingup = () => {
+    setOtpCheckPage(false);
+    setSignInPage(false);
+    setSignUpPage(true);
+  };
+
+  const onSignUpFormValue = (e) => {
+    const { name, value } = e.target;
+    setSignUpValue((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const userAdminSingUpSubmit = (e) => {
+    setSignUpValues(signUpValue);
+    setUserEmail(signUpValue.email);
+    e.preventDefault();
+    setSignUpValue({ firstName: "", lastName: "", email: "", password: "" });
+  };
+
+  useEffect(() => {
+    if (
+      signup_success?.userSignUp1?.userSignUpTableDataInfoEmail?.columnData ===
+      userEmail
+    ) {
+      setOtpCheckPage(false);
+      setSignInPage(true);
+      setSignUpPage(false);
+    }
+  }, [signup_success?.userSignUp1?.userSignUpTableDataInfoEmail?.columnData]);
 
   return (
     <>
@@ -238,21 +363,21 @@ export default function NavBar({
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      {singIn === true ? (
-                        <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                      {adminUser?.user_flag === true ? (
+                        <Menu.Button className="capitalize relative border-1 flex rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 text-black font-bold text-[18px]">
                           <span className="absolute -inset-1.5" />
                           <span className="sr-only">Open user menu</span>
                           <img
                             className="h-8 w-8 rounded-full"
-                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt=""
+                            src=""
+                            alt={adminUser?.user_email.split("")[0]}
                           />
                         </Menu.Button>
                       ) : (
                         <button
                           class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-1 px-4 border  border-gray-400 rounded-full shadow"
                           onClick={() => {
-                            setSignInPage(true);
+                            setSignIn(true);
                           }}
                         >
                           Sign In
@@ -298,7 +423,7 @@ export default function NavBar({
                         <Menu.Item>
                           {({ active }) => (
                             <a
-                              href="#"
+                              onClick={adminUserLogout}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
@@ -339,12 +464,12 @@ export default function NavBar({
           </>
         )}
       </Disclosure>
-      <Transition.Root show={signInPage} as={Fragment}>
+      <Transition.Root show={singIn} as={Fragment}>
         <Dialog
           as="div"
           className="relative z-10"
           initialFocus={cancelButtonRef}
-          onClose={setOpen}
+          onClose={setSignIn}
         >
           <Transition.Child
             as={Fragment}
@@ -373,10 +498,9 @@ export default function NavBar({
                   <div className="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                     <button
                       type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-full px-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto hover:text-red-700"
+                      className="mt-2 inline-flex w-full justify-center rounded-full px-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto hover:text-red-700"
                       onClick={() => {
-                        setSignInPage(false);
-                        setSignUpPage(false);
+                        setSignIn(false);
                       }}
                       ref={cancelButtonRef}
                     >
@@ -396,231 +520,42 @@ export default function NavBar({
                       </svg>
                     </button>
                   </div>
-                  <div className="bg-white px-4 pb-0 mb-10 pt-0 sm:p-6 sm:pb-4">
-                    {signUpPage === false ? (
-                      eval(cardDataDic)?.map((item, i) => {
-                        return (
-                          <>
-                            <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-2 lg:px-8">
-                              <div className="mt-0 sm:mx-auto sm:w-full sm:max-w-sm">
-                                <form
-                                  className="space-y-6"
-                                  // action="#"
-                                  // method="POST"
-                                >
-                                  {item.item === "input" ? (
-                                    <div>
-                                      <label
-                                        htmlFor="email"
-                                        className="block text-sm font-medium leading-6 text-gray-900"
-                                      >
-                                        {item.label}
-                                      </label>
-                                      <div className="mt-0">
-                                        <input
-                                          id="email"
-                                          name="email"
-                                          type="email"
-                                          autoComplete="email"
-                                          required
-                                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                      </div>
-                                    </div>
-                                  ) : item.item === "password" ? (
-                                    <div>
-                                      <div className="flex items-center justify-between">
-                                        <label
-                                          htmlFor="password"
-                                          className="block text-sm font-medium leading-6 text-gray-900"
-                                        >
-                                          Password
-                                        </label>
-                                        <div className="text-sm">
-                                          <a
-                                            href="#"
-                                            className="font-semibold text-indigo-600 hover:text-indigo-500"
-                                          >
-                                            Forgot password?
-                                          </a>
-                                        </div>
-                                      </div>
-                                      <div className="mt-0">
-                                        <input
-                                          id="password"
-                                          name="password"
-                                          type="password"
-                                          autoComplete="current-password"
-                                          required
-                                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                        />
-                                      </div>
-                                    </div>
-                                  ) : item.item === "button" ? (
-                                    <div>
-                                      <button
-                                        type="submit"
-                                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                        onClick={() => {
-                                          setSignInPage(false);
-                                          onMutationDataClick();
-                                        }}
-                                      >
-                                        Sign in
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    ""
-                                  )}
-                                </form>
-
-                                {/* <p className="mt-10 text-center text-sm text-gray-500">
-                                  Not a member?{" "}
-                                  <a
-                                    href="#"
-                                    className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                                    onClick={() => setSignUpPage(true)}
-                                  >
-                                    Sign Up Please
-                                  </a>
-                                </p> */}
-                              </div>
-                            </div>
-                          </>
-                        );
-                      })
+                  <div className="px-4 pb-0 mb-10 pt-0 sm:p-6 sm:pb-4">
+                    {signInPage === true ? (
+                      <SingIn
+                        singIn={singIn}
+                        setSignIn={singIn}
+                        signInPage={signInPage}
+                        setSignInPage={setSignInPage}
+                        signUpPage={signUpPage}
+                        setSignUpPage={setSignUpPage}
+                        signInValue={signInValue}
+                        setSignInValue={setSignInValue}
+                        onSignInFormValue={onSignInFormValue}
+                        handleSubmit={handleSubmit}
+                        userAdminSingup={userAdminSingup}
+                        userEmail={userEmail}
+                        successFulSignUpEmail={
+                          signup_success?.userSignUp1
+                            ?.userSignUpTableDataInfoEmail?.columnData
+                        }
+                      />
+                    ) : otpCheckPage === true ? (
+                      <OtpCheck
+                        otpCheckValue={otpCheckValue}
+                        setOtpCheckValue={setOtpCheckValue}
+                        confirmOtp={confirmOtp}
+                      />
+                    ) : signUpPage === true ? (
+                      <SignUp
+                        setSignInPage={setSignInPage}
+                        setSignUpPage={setSignUpPage}
+                        signUpValue={signUpValue}
+                        userAdminSingUpSubmit={userAdminSingUpSubmit}
+                        onSignUpFormValue={onSignUpFormValue}
+                      />
                     ) : (
-                      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-2 lg:px-8">
-                        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                          <h2 className="mt-0 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                            Sign up your account
-                          </h2>
-                        </div>
-
-                        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                          <form className="space-y-6" action="#" method="POST">
-                            <div className="flex gap-10">
-                              <div>
-                                <label
-                                  htmlFor="firstname"
-                                  className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                  First Name
-                                </label>
-                                <div className="mt-2">
-                                  <input
-                                    id="firstname"
-                                    name="firstname"
-                                    type="text"
-                                    autoComplete="first name"
-                                    required
-                                    className="flex w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <label
-                                  htmlFor="lastname"
-                                  className="flex text-sm font-medium leading-6 text-gray-900"
-                                >
-                                  Last Name
-                                </label>
-                                <div className="mt-2">
-                                  <input
-                                    id="lastname"
-                                    name="lastname"
-                                    type="text"
-                                    autoComplete="last name"
-                                    required
-                                    className=" w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                            <div>
-                              <label
-                                htmlFor="email"
-                                className="block text-sm font-medium leading-6 text-gray-900"
-                              >
-                                Email address
-                              </label>
-                              <div className="mt-2">
-                                <input
-                                  id="email"
-                                  name="email"
-                                  type="email"
-                                  autoComplete="email"
-                                  required
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <div className="flex items-center justify-between">
-                                <label
-                                  htmlFor="password1"
-                                  className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                  Password
-                                </label>
-                              </div>
-                              <div className="mt-2">
-                                <input
-                                  id="password1"
-                                  name="password1"
-                                  type="password"
-                                  autoComplete="current-password"
-                                  required
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <div className="flex items-center justify-between">
-                                <label
-                                  htmlFor="password2"
-                                  className="block text-sm font-medium leading-6 text-gray-900"
-                                >
-                                  Confirm Password
-                                </label>
-                              </div>
-                              <div className="mt-2">
-                                <input
-                                  id="password2"
-                                  name="password2"
-                                  type="password"
-                                  autoComplete="current-password"
-                                  required
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                              </div>
-                            </div>
-
-                            <div>
-                              <button
-                                type="submit"
-                                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                onClick={() => setSignInPage(false)}
-                              >
-                                Sign up
-                              </button>
-                            </div>
-                          </form>
-
-                          <p className="mt-10 text-center text-sm text-gray-500">
-                            <a
-                              href="#"
-                              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                              onClick={() => setSignUpPage(false)}
-                            >
-                              Sign in to your account
-                            </a>
-                          </p>
-                        </div>
-                      </div>
+                      ""
                     )}
                   </div>
                 </Dialog.Panel>

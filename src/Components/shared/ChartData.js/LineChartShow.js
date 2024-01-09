@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,18 +10,6 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import CloseIcon from "@mui/icons-material/Close";
-
-import { CodeSharp } from "@material-ui/icons";
-import { IconButton } from "@mui/material";
-
-import { gql, useQuery, useMutation } from "@apollo/client";
-
-import {
-  NEW_TABLE_DATA_REF_QUERY,
-  TABLE_DATA_DETAIL,
-  GET_ALL_TABLE_DATA_QUERY,
-} from "../../../GraphQL/Queries";
 
 ChartJS.register(
   CategoryScale,
@@ -38,64 +26,48 @@ export const options = {
   plugins: {
     legend: {
       position: "top",
+      display: false,
+      legend: false,
     },
-    title: {
-      display: true,
-      text: "Chart.js Line Chart",
+    // title: {
+    //   display: true,
+    //   text: "Chart.js Line Chart",
+    // },
+  },
+  type: "line",
+  scales: {
+    x: {
+      display: false,
     },
   },
 };
 
-const LineChartShow = ({ dataSource }) => {
-  const {
-    loading: flow_card_data_loading,
-    error: flow_card_data_error,
-    data: flow_card_data,
-  } = useQuery(TABLE_DATA_DETAIL, {
-    variables: { tableId: 544, tableColId: 1, tabRelId: "" },
-  });
+export function LinechartDataShow({ sourceData }) {
+  // const concatenatedData = [].concat(...sourceData);
 
-  function getRandomColor() {
-    // Generate random values for red, green, and blue channels
-    const red = Math.floor(Math.random() * 256);
-    const green = Math.floor(Math.random() * 256);
-    const blue = Math.floor(Math.random() * 256);
+  const concatenatedArray = sourceData.map((obj) => Object.values(obj)[0]);
 
-    // Create a color string in the format "#RRGGBB"
-    const color = `#${red.toString(16)}${green.toString(16)}${blue.toString(
-      16
-    )}`;
-
-    return color;
-  }
+  console.log("check source data", concatenatedArray);
 
   const myDataDic = [];
   const labels = [];
 
-  console.log("data8552hfgh", dataSource);
-
   const marDatavalue = [];
 
-  for (let i = 0; i < dataSource?.length; i++) {
-    myDataDic.push(
-      {
-        label: "demo",
-        data: dataSource[i]?.data?.map((item1, k) => item1.High),
-        borderColor: getRandomColor(),
-        backgroundColor: getRandomColor(),
-      }
-      // {
-      //   label: "Source High File " + eval(i + 1),
-      //   data: sourceData[i]?.edit?.map((item1, k) => item1.High),
-      //   borderColor: getRandomColor(),
-      //   backgroundColor: getRandomColor(),
-      // }
-    );
+  for (let i = 0; i < concatenatedArray?.length; i++) {
+    myDataDic.push({
+      label: "demo",
+      data: concatenatedArray[i]?.map((item1, k) => item1.High),
+      borderColor: "rgb(53, 162, 235)",
+      backgroundColor: "rgba(53, 162, 235, 0.5)",
+      borderWidth: 1,
+      tension: 0.1,
+      point: false,
+      pointRadius: 0,
+    });
   }
 
-  console.log("data", marDatavalue);
-
-  const label = dataSource[0]?.data?.map((item1, k) => item1.Date);
+  const label = concatenatedArray[0]?.map((item1, k) => item1.Date);
 
   const dataValue = [];
   const data = {
@@ -103,10 +75,12 @@ const LineChartShow = ({ dataSource }) => {
     datasets: myDataDic,
   };
   return (
-    <div style={{ height: 350, width: 900 }}>
-      <Line options={options} data={data} />
+    <div>
+      <Line
+        options={options}
+        data={data}
+        style={{ height: "400px", maxWidth: "100%" }}
+      />
     </div>
   );
-};
-
-export default LineChartShow;
+}

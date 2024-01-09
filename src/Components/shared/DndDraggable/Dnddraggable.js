@@ -52,8 +52,6 @@ const Dnddraggable = (props) => {
     }
   };
 
-  console.log("check 55", items);
-
   return (
     <DndContext
       sensors={sensors}
@@ -84,9 +82,10 @@ const Dnddraggable = (props) => {
                       flagId={id.cardFlagId}
                       handle={true}
                       value={id.cardItem}
-                      top={id.cardTop}
-                      bottom={id.cardBottom}
-                      items={items}
+                      flowname={id.flowName}
+                      process={id.cardProcessname}
+                      items={id.cardItem}
+                      fixedValue={items}
                     />
                   </div>
                 );

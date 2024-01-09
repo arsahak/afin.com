@@ -11,6 +11,7 @@ import { TABLE_COLUMN_DATA_UPDATE } from "../../../GraphQL/Mutations";
 import FormTable from "../ChartData.js/FormTable";
 import SqlDataTable from "../ChartData.js/SqlDataTable";
 import CustomFormTable from "../ChartData.js/CustomFormTable";
+import CardFormDesign from "../ChartData.js/CardFormDesign";
 
 const SortableItem = (props) => {
   const {
@@ -63,188 +64,42 @@ const SortableItem = (props) => {
   const [formSubmit, setFormSubmit] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("userSortData", JSON.stringify(props.items));
+    localStorage.setItem("userSortData", JSON.stringify(props.fixedValue));
   }, [props.flagId]);
+
 
   return (
     <>
-      {eval(props.value)[0].process === "linebarchart" ? (
-        <div onClick={() => handleDelete(props.flagId)} className="h-[200px]">
-          <div className="float-right bg-sky-500 hover:bg-sky-700  ">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 text-white"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </div>
-          <div ref={setNodeRef} style={style}>
-            <a
-              {...listeners}
-              {...attributes}
-              href="#"
-              className="block max-w-100% h-400 pb-6 p-1 bg-white border border-gray-100 rounded-lg dark:bg-gray-800 dark:border-gray-700"
-            >
-              <div className="flex-row float-left font-mono text-sm">
-                {props.top}
-              </div>
-              <div className="max-w-100% h-400 mt-20 mb-10">
-                <LineChartGraph
-                  lineChart={eval(props.value) || "demo"}
-                  id={props.id}
-                  logData={logData}
-                />
-              </div>
-              <div className="flex-row float-left font-mono text-sm">
-                {props.bottom}
-              </div>
-            </a>
-          </div>
+      <div onClick={() => handleDelete(props.flagId)} className="h-[200px]">
+        <div className="float-right bg-sky-500 hover:bg-sky-700  ">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6 text-white"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
         </div>
-      ) : eval(props.value)[0].process === "tabledata" ? (
-        <div onClick={() => handleDelete(props.flagId)} className="">
-          <div className="float-right bg-sky-500 hover:bg-sky-700 , ">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 text-white"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </div>
-          <div ref={setNodeRef} style={style}>
-            <a
-              {...listeners}
-              {...attributes}
-              href="#"
-              className="block max-w-100% h-400 pb-6 p-1 bg-white border border-gray-100 rounded-lg dark:bg-gray-800 dark:border-gray-700"
-            >
-              <div className="flex-row float-left font-mono text-sm">
-                {" "}
-                {props.top}
-              </div>
-              <div className="max-w-100% h-100 mt-8 mb-5">
-                <TableData
-                  lineChart={eval(props.value) || "demo"}
-                  id={props.id}
-                  logData={logData}
-                />
-              </div>
-              <div className="flex-row float-left font-mono text-sm">
-                {props.bottom}
-              </div>
-            </a>
-          </div>
+        <div ref={setNodeRef} style={style}>
+          <a
+            {...listeners}
+            {...attributes}
+            href="#"
+            className="block max-w-100% h-400 pb-6 p-1 bg-white border border-gray-100 rounded-lg dark:bg-gray-800 dark:border-gray-700"
+          >
+            <div className="max-w-100% h-400">
+              <CardFormDesign fields={eval(props.items)} />
+            </div>
+          </a>
         </div>
-      ) : eval(props.value)[0].process === "formtable" ? (
-        <>
-          <div onClick={() => handleDelete(props.flagId)} className="">
-            <div className="float-right bg-sky-500 hover:bg-sky-700 , ">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6 text-white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </div>
-            <div ref={setNodeRef} style={style}>
-              <div
-                {...listeners}
-                {...attributes}
-                href="#"
-                className="block max-w-100% h-400 pb-6 p-1 bg-white border border-gray-100 rounded-lg dark:bg-gray-800 dark:border-gray-700"
-              >
-                <div className="flex-row float-left font-mono text-sm">
-                  {props.top}
-                </div>
-                <div className="max-w-100% h-400 mt-8 mb-5">
-                  {/* <FormTable
-                    lineChart={eval(props.value) || "demo"}
-                    id={props.id}
-                    logData={logData}
-                    formSubmit={formSubmit}
-                  /> */}
-                  <CustomFormTable data={eval(props.value) || "demo"} />
-                </div>
-
-                <div className="flex-row float-left font-mono text-sm">
-                  {props.bottom}
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : eval(props.value)[0].process === "sqlquery" ? (
-        <>
-          <div onClick={() => handleDelete(props.flagId)} className="">
-            <div className="float-right bg-sky-500 hover:bg-sky-700 , ">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6 text-white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </div>
-            <div ref={setNodeRef} style={style}>
-              <div
-                {...listeners}
-                {...attributes}
-                href="#"
-                className="block max-w-100% h-400 pb-6 p-1 bg-white border border-gray-100 rounded-lg dark:bg-gray-800 dark:border-gray-700"
-              >
-                <div className="flex-row float-left font-mono text-sm">
-                  {props.top}
-                </div>
-                <div className="max-w-100% h-400 mt-8 mb-5">
-                  <SqlDataTable
-                    lineChart={eval(props.value) || ""}
-                    id={props.id}
-                    logData={logData}
-                    formSubmit={formSubmit}
-                  />
-                </div>
-                <div className="flex-row float-left font-mono text-sm">
-                  {" "}
-                  {props.bottom}
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        ""
-      )}
+      </div>
     </>
   );
 };

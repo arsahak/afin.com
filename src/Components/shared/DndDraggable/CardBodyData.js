@@ -1,9 +1,32 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import CardPropatiesSelection from "./CardPropatiesSelection";
 import GetQueryRel from "../../../GraphQLApiCall/GetQueryRel";
+import GetAllTableData from "../../../GraphQLApiCall/GetAllTableData";
+import { UserContext } from "../../../UseContext/UserContext";
 
 const CardBodyData = () => {
+  const { singIn, setSignIn } = useContext(UserContext);
   const card_data = GetQueryRel(534, 0, "");
+  const user = GetAllTableData(1);
+  const [userId, setUserId] = useState("null");
+
+  const userDetails = eval(
+    user?.all_table_data?.getDynamicTableField?.jsonData
+  );
+
+  const adminUserData = JSON.parse(
+    localStorage.getItem("admin_user") || `{"demo":"1"}`
+  );
+
+  useEffect(() => {
+    if (adminUserData.user_flag === true) {
+      userDetails?.map((item, i) => {
+        if (adminUserData.user_email === item.email) {
+          setUserId(item.user_id);
+        }
+      });
+    }
+  }, [userId, userDetails, adminUserData, singIn]);
 
   let cardNameDic = [];
   let cardItemDic = [];
@@ -15,56 +38,57 @@ const CardBodyData = () => {
   let cardMenuDic = [];
 
   card_data?.getTableDataRelIdInfo?.map((item, i) => {
-    if (item.tableColId === 1) {
+    if (item.tableColId === 1 && item.userId === userId) {
       cardNameDic.push({
         cardName: item.columnData,
         id: item.tableRefId,
         cardNameId: item.tableDataId,
+        userId: item.userId,
       });
     }
-    if (item.tableColId === 4) {
+    if (item.tableColId === 4 && item.userId === userId) {
       cardItemDic.push({
         cardItem: item.columnData,
         id: item.tableRefId,
         cardItemId: item.tableDataId,
       });
     }
-    if (item.tableColId === 3) {
+    if (item.tableColId === 3 && item.userId === userId) {
       cardBottomDic.push({
-        cardBottom: item.columnData,
+        cardProcessname: item.columnData,
         id: item.tableRefId,
-        cardBottomId: item.tableDataId,
+        cardProcessnameId: item.tableDataId,
       });
     }
-    if (item.tableColId === 2) {
+    if (item.tableColId === 2 && item.userId === userId) {
       cardTopDic.push({
-        cardTop: item.columnData,
+        cardFlowname: item.columnData,
         id: item.tableRefId,
-        cardTopId: item.tableDataId,
+        cardFlownameId: item.tableDataId,
       });
     }
-    if (item.tableColId === 5) {
+    if (item.tableColId === 5 && item.userId === userId) {
       cardSizeDic.push({
         cardSize: item.columnData,
         id: item.tableRefId,
         cardSizeId: item.tableDataId,
       });
     }
-    if (item.tableColId === 6) {
+    if (item.tableColId === 6 && item.userId === userId) {
       cardFlagDic.push({
         cardFlag: item.columnData,
         id: item.tableRefId,
         cardFlagId: item.tableDataId,
       });
     }
-    if (item.tableColId === 7) {
+    if (item.tableColId === 7 && item.userId === userId) {
       cardIdDic.push({
         cardId: item.columnData,
         id: item.tableRefId,
         cardDataId: item.tableDataId,
       });
     }
-    if (item.tableColId === 8) {
+    if (item.tableColId === 8 && item.userId === userId) {
       cardMenuDic.push({
         cardMenu: item.columnData,
         id: item.tableRefId,
@@ -115,8 +139,6 @@ const CardBodyData = () => {
   };
 
   const allCardData = mergeArrays();
-
-  console.log("check item form design value 119", allCardData);
 
   return (
     <div>

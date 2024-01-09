@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { TABLE_DATA_DETAIL } from "../GraphQL/Queries";
+import {
+  TABLE_DATA_DETAIL,
+  GET_ALL_TABLE_DATA_QUERY,
+} from "../GraphQL/Queries";
 import { TABLE_COLUMN_DATA_UPDATE } from "../GraphQL/Mutations";
 
 const useMutationUpdateRel = () => {
@@ -21,6 +24,12 @@ const useMutationUpdateRel = () => {
           tableId: tableUpdateId,
           tableColId: tableUpdateColId,
           tabRelId: tableUpdateRelId,
+        },
+      },
+      {
+        query: GET_ALL_TABLE_DATA_QUERY,
+        variables: {
+          tableId: tableUpdateId,
         },
       },
     ],

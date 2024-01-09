@@ -781,3 +781,19 @@ export const COURSE_MCQ_FINAL_RESULT_MUTATION = gql`
     }
   }
 `;
+export const CREATE_MULTIPLE_DYNAMIC_TABLE_DATA = gql`
+  mutation createMultipleDynamicTableData($tableDataList: [TableDataInput]) {
+    createMultipleDynamicTableData(tableDataList: $tableDataList) {
+      tableDataInfoType {
+        tableDataId
+        tableId
+        tableColId
+        columnName
+        columnData
+        tableRefId
+        tabRelId
+        userId
+      }
+    }
+  }
+`;

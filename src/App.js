@@ -14,6 +14,7 @@ function App() {
   const [confrimSort, setConfrimSort] = useState("demo");
   const [menuName, setMenuName] = useState("Home");
   const [navClick, setNavClick] = useState("");
+  const [singIn, setSignIn] = useState(false);
 
   return (
     <UserContext.Provider
@@ -28,6 +29,8 @@ function App() {
         setMenuName,
         navClick,
         setNavClick,
+        singIn,
+        setSignIn,
       }}
     >
       <TopBar />

@@ -40,8 +40,6 @@ const PopupTableData = ({ dataSource }) => {
     setDataLog,
   } = useChartRunData();
 
-  console.log("data s", dataSource);
-
   const concatenatedData = [].concat(...dataSource);
 
   const columns = [

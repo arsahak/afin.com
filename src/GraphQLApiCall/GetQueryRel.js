@@ -4,6 +4,10 @@ import { gql, useQuery, useMutation } from "@apollo/client";
 import { TABLE_DATA_DETAIL } from "../GraphQL/Queries";
 
 const GetQueryRel = (id, col, rel) => {
+  // const [getTableId, setGetTableId] = useState(null);
+  // const [getTableColId, setGetTableColId] = useState(null);
+  // const [getTableRelId, setGetTableRelId] = useState(null);
+
   const {
     loading: data_loading,
     error: data_error,
@@ -15,6 +19,12 @@ const GetQueryRel = (id, col, rel) => {
       tabRelId: rel,
     },
   });
+
+  // useEffect(() => {
+  //   setGetTableId(id);
+  //   setGetTableColId(col);
+  //   setGetTableRelId(rel);
+  // }, [id, col, rel]);
 
   return get_data;
 };

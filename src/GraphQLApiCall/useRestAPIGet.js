@@ -1,25 +1,27 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 
-const useRestAPIGet = () => {
-  // const processLogFetchData = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       "https://itb-usa.a2hosted.com/account/get-table-dynamic-field/542/"
-  //     );
-  //     if (!response.ok) {
-  //       throw new Error("Network response was not ok.");
-  //     }
-  //     const data = await response.json();
-  //     setProcessLogData(data);
-  //     console.log("check 112", data);
-  //   } catch (error) {
-  //     setError(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+const useRestAPIGet = (url) => {
+  const [restApiData, setData] = useState("");
+  const [restApiLoading, setLoading] = useState(true);
+  const [restApiError, setError] = useState(null);
 
-  return <div>RestAPIGET</div>;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(url);
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [url]);
+
+  return { restApiData, restApiLoading, restApiError };
 };
 
 export default useRestAPIGet;

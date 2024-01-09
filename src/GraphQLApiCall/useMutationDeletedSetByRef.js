@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { GET_ALL_TABLE_DATA_QUERY } from "../GraphQL/Queries";
+import {
+  GET_ALL_TABLE_DATA_QUERY,
+  TABLE_DATA_DETAIL,
+} from "../GraphQL/Queries";
 import { DELETED_TABLE_DATA_BY_REF_ID } from "../GraphQL/Mutations";
 import { UserContext } from "../UseContext/UserContext";
 
@@ -25,6 +28,14 @@ const useMutationDeletedSetByRef = () => {
         query: GET_ALL_TABLE_DATA_QUERY,
         variables: {
           tableId: tableDeletedId,
+        },
+      },
+      {
+        query: TABLE_DATA_DETAIL,
+        variables: {
+          tableId: tableDeletedId,
+          tableColId: 1,
+          tabRelId: "",
         },
       },
     ],
