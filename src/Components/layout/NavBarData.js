@@ -42,8 +42,6 @@ const NavBarData = () => {
     localStorage.getItem("admin_user") || `{"demo":"1"}`
   );
 
-  console.log("check user data 45", adminUserData);
-
   const { singIn } = useContext(UserContext);
   const [userId, setUserId] = useState("null");
   const [menuList, setMenuList] = useState([

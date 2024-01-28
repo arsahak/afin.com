@@ -17,49 +17,65 @@ const MasterDetails = ({ value }) => {
   const [valueOne, setValueOne] = useState("");
   const [valueTwo, setValueTwo] = useState("");
 
+  console.log("chekc vlaue 20", value.colInfo);
+
   const getUniqueId = () => `${+new Date()}`.slice(-9);
   let rows = [];
   const columns = [];
 
   const onMasterDltDataSave = () => {
     let uniqueId = getUniqueId();
-    let jsonData = [
-      {
-        tableId: value.tableId,
-        tableColId: value.col[0].colNo,
-        tabRelId: uniqueId.toString(),
-        tableRefId: uniqueId,
-        columnData: valueOne,
-        columnName: "",
-        userId: "",
-      },
-    ];
+    let jsonData = [];
+
+    value?.colInfo?.map((item, i) => {
+      jsonData.push(
+        {
+          tableId: item.masterTableId,
+          tableColId: item.masterColId,
+          tabRelId: uniqueId.toString(),
+          tableRefId: uniqueId,
+          columnData: valueOne,
+          columnName: item.masterCol,
+          userId: "2",
+        },
+        {
+          tableId: item.detailsTableId,
+          tableColId: item.detailsColId,
+          tabRelId: uniqueId.toString(),
+          tableRefId: uniqueId,
+          columnData: valueTwo,
+          columnName: item.detailsCol,
+          userId: "2",
+        }
+      );
+    });
+
     setTableData(jsonData);
     setTableId(value.sourceTwo);
     setTableRel("");
     setTableCol(1);
   };
 
-  useEffect(() => {
-    let uniqueId = getUniqueId();
-    let jsonData = [
-      {
-        tableId: value.tableId,
-        tableColId: value.col[1].colNo,
-        tabRelId:
-          data?.createMultipleDynamicTableData?.tableDataInfoType[0]
-            ?.tableDataId,
-        tableRefId: uniqueId,
-        columnData: valueTwo,
-        columnName: "",
-        userId: "",
-      },
-    ];
-    setTableData(jsonData);
-    setTableId(value.sourceTwo);
-    setTableRel("");
-    setTableCol(1);
-  }, [data?.createMultipleDynamicTableData?.tableDataInfoType[0]?.tableDataId]);
+  // useEffect(() => {
+  //   let uniqueId = getUniqueId();
+  //   let jsonData = [
+  //     {
+  //       tableId: value.tableId,
+  //       tableColId: value.col[1].colNo,
+  //       tabRelId:
+  //         data?.createMultipleDynamicTableData?.tableDataInfoType[0]
+  //           ?.tableDataId,
+  //       tableRefId: uniqueId,
+  //       columnData: valueTwo,
+  //       columnName: "",
+  //       userId: "",
+  //     },
+  //   ];
+  //   setTableData(jsonData);
+  //   setTableId(value.sourceTwo);
+  //   setTableRel("");
+  //   setTableCol(1);
+  // }, [data?.createMultipleDynamicTableData?.tableDataInfoType[0]?.tableDataId]);
 
   // console.log("check value 53", );
 
